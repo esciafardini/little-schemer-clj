@@ -1,4 +1,4 @@
-#The preface
+# The preface
 
 - Recursion is the act of defining an object or solving a problem in terms of itself
 - The goal of this book is to teach the reader to think recursively
@@ -8,13 +8,13 @@
 -  => `simple pattern recognition`
 
 ## SCHEME LORD MAP
-- car => first    ;MY FIRST CAR OMG PRIIIZZZMM
-- cdr => rest     ;rest in peace CD-Rs, mp3s are forever
-- eq? => =        ;but no strict equivalent, for not in memory obj
+- car => first
+- cdr => rest
+- eq? => =
 - null? => nil?
 - add1 => inc
 - sub1 => dec
-- lambda => let
+- lambda => fn (I think?)
 - define => def
 - pair? => list?
 
