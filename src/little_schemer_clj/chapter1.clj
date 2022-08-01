@@ -2,10 +2,10 @@
 
 (defn atom?
   "Atoms are not null && not surrounded by parens
-    Strings allowed
-    Symbols allowed
-    Lists not allowed
-    For Clojure purposes, no collections allowed also (since they implement ISeq)"
+   Strings allowed
+   Symbols allowed
+   Lists not allowed
+   For Clojure purposes, no collections allowed also (since they implement ISeq)"
   [x]
   (and (not (coll? x)) (some? x)))
 
@@ -16,7 +16,8 @@
 
 (defn s-expression?
   "All atoms are s-expressions
-     All lists are s-expressions"
+   All lists are s-expressions
+   nil is NOT an s-expression"
   [x]
   (not (nil? x)))
 
