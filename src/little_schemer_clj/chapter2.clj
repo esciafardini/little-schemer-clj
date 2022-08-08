@@ -8,7 +8,7 @@
   "Well, dad, it stands for List Of Atoms"
   [l]
   (cond
-    (null? l) true
+    (not (seq l)) true
     (atom? (first l)) (lat? (rest l))
     :else false))
 
@@ -16,7 +16,7 @@
   "This function recursively checks a LAT asking if `a` is a member"
   [a lat]
   (cond
-    (null? lat) false
+    (not (seq lat)) false
     (eq? (car lat) a) true
     :else (member? a (cdr lat))))
 

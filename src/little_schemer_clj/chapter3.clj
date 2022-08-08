@@ -1,7 +1,7 @@
 (ns little-schemer-clj.chapter3
   (:require
-   [little-schemer-clj.chapter1 :refer [atom? eq? not-eq? car cdr null?]]
-   [little-schemer-clj.chapter2 :refer [lat? member?]]))
+   [clojure.string :as str]
+   [little-schemer-clj.chapter1 :refer [car cdr eq? not-eq?]]))
 
 ;; Cons The Magnificent
 
@@ -12,6 +12,11 @@
 
 ;;THIRD COMMANDMENT:
 ;;  When building a list, describe the first typical element & cons it onto the natural recursion
+
+;;FOURTH COMMANDMENT (preliminary):
+;;  Always change at least one argument while recurring
+;;  The change must bring the fn towards terminal condition
+;;  The changing arg must be tested in termination condition
 
 ;;Self Version:
 (defn rember-v1
@@ -48,7 +53,7 @@
 
 ; (rember "mint" ["lamb" "mint" "jelly" "mint"])
 ;
-;  mint != lamb => 
+;  mint != lamb =>
 ;    (cons "lamb" (rember "mint" ["mint" "jelly" "mint"])
 ;                   = '("jelly" "mint")
 ;                  THEREFORE:
@@ -62,7 +67,6 @@
 (=
  (rember "mint" ["lamb" "and" "mint" "jelly" "mint"])
  (cons "lamb" (cons "and" '("jelly" "mint")))) ;=> true
-
 
 (rember "mint" ["lamb" "chops" "and" "mint" "jelly"])
 (rember "mint" ["lamb" "chops" "and" "mint" "flavored" "mint" "jelly"])
@@ -78,14 +82,21 @@
    (car (car l))"
   [l]
   (cond
-    (not (seq l)) '()
-    :else (cons (car (car l))
+    (not (seq l)) '() ;terminal condition
+    :else (cons (car (car l)) ;typical element
                 (firsts (cdr l)))))
 
 (firsts '([0 1 2 3] [8 9 5] ["first" "second" "woof"]))
 (firsts '())
 (firsts '(["five" "plums"] ["four"] ["eleven" "green" "oranges"]))
 (firsts '([["five" "plums"] "four"] ["eleven" "green" "oranges"] [["no"] "more"]))
+
+;;Mental Model that works for me:
+(firsts '(['a 'b] ['c 'd] ['e 'f]))
+;; 1. cons a onto
+;; 2. the cons of c onto
+;; 3. the cons of e onto '()
+;=> ('a 'c 'e)
 
 (defn seconds
   "This fn was mentioned in passing, but I wanted to practice
@@ -100,9 +111,87 @@
 (seconds '([1 2 3 4] ["oh" "my" "wow"] ["first element" "second element" "third element" "fourth?"]))
 (seconds '([14] ["oh" "my" "wow"] ["first element" "second element" "third element" "fourth?"]))
 
-;;Mental Model that works for me:
-(firsts '(['a 'b] ['c 'd] ['e 'f]))
-;; 1. cons e onto ()
-;; 2. cons c onto value of 1
-;; 3. cons a onto value of 2
-;=> ('a 'c 'e)
+(defn insertR
+  "Adds nu to the right of old in a lat
+   Typical element: first element of list
+   (car lat)"
+  [nu old lat]
+  (cond
+    (not (seq lat)) '()
+    (eq? old (car lat)) (cons old (cons nu (cdr lat)))
+    :else (cons (car lat) (insertR nu old (cdr lat)))))
+
+(insertR "topping" "fudge" ["ice" "cream" "with" "fudge" "for" "dessert"])
+(insertR "jalapeno" "and" ["tacos" "tamales" "and" "salsa"])
+(insertR :e :d [:a :b :c :d :f :g])
+
+(defn insertL
+  "Adds nu to the left of old in a lat
+   Typical element: first element of list
+   (car lat)"
+  [nu old lat]
+  (cond
+    (not (seq lat)) '()
+    (eq? (car lat) old) (cons nu lat)
+    :else (cons (car lat) (insertL nu old (cdr lat)))))
+
+(insertL "fudge" "topping" ["ice" "cream" "with" "topping" "for" "dessert"])
+
+(defn subst
+  "Substitutes first instance of old value with nu
+   Typical element: first element of list
+   (car lat)"
+  [nu old lat]
+  (cond
+    (not (seq lat)) '()
+    (eq? old (car lat)) (cons nu (cdr lat))
+    :else (cons (car lat) (subst nu old (cdr lat)))))
+
+(subst "small" "big" ["its" "a" "big" "world" "after" "all"])
+
+(defn subst2
+  "Replaces the first element = o1 or o2 with nu
+   Typical element: first element of list
+   (car lat)"
+  [nu o1 o2 lat]
+  (cond
+    (not (seq lat)) '()
+    (or
+     (eq? (car lat) o2)
+     (eq? (car lat) o1)) (cons nu (cdr lat))
+    :else (cons (car lat) (subst2 nu o1 o2 (cdr lat)))))
+
+(subst2 "vanilla" "chocolate" "banana" ["banana" "ice" "cream" "with" "chocolate" "topping" "for" "dessert"])
+
+(defn multirember [a lat]
+  (cond
+    (not (seq lat)) '()
+    (eq? (car lat) a) (multirember a (cdr lat))
+    :else (cons (car lat) (multirember a (cdr lat)))))
+
+(multirember "jon" ["lucy" "dave" "jon" "jon" "clark" "rick" "jon" "adam"])
+(multirember "cup" ["coffee" "cup" "covfefe" "cup" "hick" "cup"])
+
+(defn multiinsertR [nu old lat]
+  (cond
+    (not (seq lat)) '()
+    (eq? (car lat) old) (cons old (cons nu (multiinsertR nu old (cdr lat))))
+    :else (cons (car lat) (multiinsertR nu old (cdr lat)))))
+
+(multiinsertR "fried" "and" ["scallops" "and" "fish" "or" "fish" "and" "pickles"])
+
+(defn multiinsertL [nu old lat]
+  (cond
+    (not (seq lat)) '()
+    (eq? (car lat) old) (cons nu (cons old (multiinsertL nu old (cdr lat))))
+    :else (cons (car lat) (multiinsertL nu old (cdr lat)))))
+
+(multiinsertL "fried" "fish" ["chips" "and" "fish" "or" "fish" "and" "pickles"])
+
+(defn multisubst [nu old lat]
+  (cond
+    (not (seq lat)) '()
+    (eq? (car lat) old) (cons nu (multisubst nu old (cdr lat)))
+    :else (cons (car lat) (multisubst nu old (cdr lat)))))
+
+(multisubst "small" "big" ["its" "a" "big" "world" "after" "all" "and" "all" "the" "big" "people" "are" "so" "big"])
