@@ -59,23 +59,6 @@
 ;                  THEREFORE:
 ;                  equates to...  (cons "lamb" '("jelly" "mint"))
 
-;TODO: move these into test files
-(=
- (rember "mint" ["lamb" "mint" "jelly" "mint"])
- (cons "lamb" '("jelly" "mint"))) ;=> true
-
-(=
- (rember "mint" ["lamb" "and" "mint" "jelly" "mint"])
- (cons "lamb" (cons "and" '("jelly" "mint")))) ;=> true
-
-(rember "mint" ["lamb" "chops" "and" "mint" "jelly"])
-(rember "mint" ["lamb" "chops" "and" "mint" "flavored" "mint" "jelly"])
-(rember "toast" ["bacon" "lettuce" "tomato"])
-(rember "cup" ["coffee" "cup" "covfefe" "cup" "hick" "cup"])
-(rember-ERROR "mint" ["lamb" "chops" "and" "mint" "flavored" "mint" "jelly"])
-(rember-ERROR "mint" ["lamb" "chops" "and" "flavored" "jelly"])
-(rember-ERROR "and" ["bacon" "lettuce" "and" "tomato"])
-
 (defn firsts
   "returns the first value of each seq
    Typical Element: first item of each list
@@ -85,11 +68,6 @@
     (not (seq l)) '() ;terminal condition
     :else (cons (car (car l)) ;typical element
                 (firsts (cdr l)))))
-
-(firsts '([0 1 2 3] [8 9 5] ["first" "second" "woof"]))
-(firsts '())
-(firsts '(["five" "plums"] ["four"] ["eleven" "green" "oranges"]))
-(firsts '([["five" "plums"] "four"] ["eleven" "green" "oranges"] [["no"] "more"]))
 
 ;;Mental Model that works for me:
 (firsts '(['a 'b] ['c 'd] ['e 'f]))
@@ -108,9 +86,6 @@
     (< (count (first l)) 2) (seconds (cdr l))
     :else (cons (car (cdr (car l))) (seconds (cdr l)))))
 
-(seconds '([1 2 3 4] ["oh" "my" "wow"] ["first element" "second element" "third element" "fourth?"]))
-(seconds '([14] ["oh" "my" "wow"] ["first element" "second element" "third element" "fourth?"]))
-
 (defn insertR
   "Adds nu to the right of old in a lat
    Typical element: first element of list
@@ -120,10 +95,6 @@
     (not (seq lat)) '()
     (eq? old (car lat)) (cons old (cons nu (cdr lat)))
     :else (cons (car lat) (insertR nu old (cdr lat)))))
-
-(insertR "topping" "fudge" ["ice" "cream" "with" "fudge" "for" "dessert"])
-(insertR "jalapeno" "and" ["tacos" "tamales" "and" "salsa"])
-(insertR :e :d [:a :b :c :d :f :g])
 
 (defn insertL
   "Adds nu to the left of old in a lat
@@ -135,8 +106,6 @@
     (eq? (car lat) old) (cons nu lat)
     :else (cons (car lat) (insertL nu old (cdr lat)))))
 
-(insertL "fudge" "topping" ["ice" "cream" "with" "topping" "for" "dessert"])
-
 (defn subst
   "Substitutes first instance of old value with nu
    Typical element: first element of list
@@ -146,8 +115,6 @@
     (not (seq lat)) '()
     (eq? old (car lat)) (cons nu (cdr lat))
     :else (cons (car lat) (subst nu old (cdr lat)))))
-
-(subst "small" "big" ["its" "a" "big" "world" "after" "all"])
 
 (defn subst2
   "Replaces the first element = o1 or o2 with nu
@@ -161,16 +128,11 @@
      (eq? (car lat) o1)) (cons nu (cdr lat))
     :else (cons (car lat) (subst2 nu o1 o2 (cdr lat)))))
 
-(subst2 "vanilla" "chocolate" "banana" ["banana" "ice" "cream" "with" "chocolate" "topping" "for" "dessert"])
-
 (defn multirember [a lat]
   (cond
     (not (seq lat)) '()
     (eq? (car lat) a) (multirember a (cdr lat))
     :else (cons (car lat) (multirember a (cdr lat)))))
-
-(multirember "jon" ["lucy" "dave" "jon" "jon" "clark" "rick" "jon" "adam"])
-(multirember "cup" ["coffee" "cup" "covfefe" "cup" "hick" "cup"])
 
 (defn multiinsertR [nu old lat]
   (cond
@@ -178,20 +140,14 @@
     (eq? (car lat) old) (cons old (cons nu (multiinsertR nu old (cdr lat))))
     :else (cons (car lat) (multiinsertR nu old (cdr lat)))))
 
-(multiinsertR "fried" "and" ["scallops" "and" "fish" "or" "fish" "and" "pickles"])
-
 (defn multiinsertL [nu old lat]
   (cond
     (not (seq lat)) '()
     (eq? (car lat) old) (cons nu (cons old (multiinsertL nu old (cdr lat))))
     :else (cons (car lat) (multiinsertL nu old (cdr lat)))))
 
-(multiinsertL "fried" "fish" ["chips" "and" "fish" "or" "fish" "and" "pickles"])
-
 (defn multisubst [nu old lat]
   (cond
     (not (seq lat)) '()
     (eq? (car lat) old) (cons nu (multisubst nu old (cdr lat)))
     :else (cons (car lat) (multisubst nu old (cdr lat)))))
-
-(multisubst "small" "big" ["its" "a" "big" "world" "after" "all" "and" "all" "the" "big" "people" "are" "so" "big"])

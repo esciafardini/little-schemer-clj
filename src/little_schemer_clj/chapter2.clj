@@ -19,9 +19,3 @@
     (not (seq lat)) false
     (eq? (car lat) a) true
     :else (member? a (cdr lat))))
-
-(comment
-  (lat? (list 1 2 3 'whoa))
-  (lat? (list 1 2 4 (list 1 2 3)))
-  (member? "a" (list 1 2 3 4 5))
-  (member? "mashed" (list "gravy" "and" "mashed" "potato")))

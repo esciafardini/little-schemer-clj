@@ -46,8 +46,3 @@
   (if (listp? x)
     (empty? x)
     nil))
-
-(comment
-  (s-expression? 5)
-  (s-expression? nil)
-  (s-expression? (list 5 4 3 2 1)))
