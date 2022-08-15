@@ -11,9 +11,9 @@
 
 (deftest falser
   (is (= (member? "a" (list 1 2 3 4 5)) false))
-  (is (= (lat? '(("Jack") Sprat could eat no chicken fat)) false))
-  (is (= (lat? '(Jack (Sprat could) eat no chicken fat)) false))
+  (is (= (lat? '(("Jack") "Sprat" "could" "eat" "no" "chicken" "fat")) false))
+  (is (= (lat? '("Jack" ("Sprat" "could") "eat" "no" "chicken" "fat")) false))
   (is (= (lat? (list 1 2 4 (list 1 2 3))) false))
-  (is (= (lat? '(bacon (and eggs))) false)))
+  (is (= (lat? '("bacon" ("and" "eggs"))) false)))
 
 (run-tests)
