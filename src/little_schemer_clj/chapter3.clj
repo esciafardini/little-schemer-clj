@@ -1,7 +1,6 @@
 (ns little-schemer-clj.chapter3
   (:require
-   [clojure.string :as str]
-   [little-schemer-clj.chapter1 :refer [car cdr eq? not-eq?]]))
+   [little-schemer-clj.chapter1 :refer [eq? not-eq?]]))
 
 ;; Cons The Magnificent
 
@@ -25,8 +24,8 @@
   [a lat]
   (cond
     (not (seq lat)) '()
-    (eq? a (car lat)) (rember-v1 '() (cdr lat)) ;a will never be '() bc a can never be a list
-    (not-eq? a (car lat)) (cons (car lat) (cdr a (rest lat)))))
+    (eq? a (first lat)) (rember-v1 '() (rest lat)) ;a will never be '() bc a can never be a list
+    (not-eq? a (first lat)) (cons (first lat) (rest a (rest lat)))))
 
 ;;Book's Bad Version:
 (defn rember-ERROR
@@ -37,8 +36,8 @@
   (cond
     (not (seq lat)) '()
     :else (cond
-            (eq? (car lat) a) (cdr lat)
-            :else (rember-ERROR a (cdr lat)))))
+            (eq? (first lat) a) (rest lat)
+            :else (rember-ERROR a (rest lat)))))
 
 ;;Enlightened Master Self Version
 (defn rember
@@ -47,9 +46,9 @@
   [a lat]
   (cond
     (not (seq lat)) '()
-    (eq? a (car lat)) (cdr lat)
-    :else (cons (car lat)
-                (rember a (cdr lat)))))
+    (eq? a (first lat)) (rest lat)
+    :else (cons (first lat)
+                (rember a (rest lat)))))
 
 ; (rember "mint" ["lamb" "mint" "jelly" "mint"])
 ;
@@ -66,8 +65,8 @@
   [l]
   (cond
     (not (seq l)) '() ;terminal condition
-    :else (cons (car (car l)) ;typical element
-                (firsts (cdr l)))))
+    :else (cons (first (first l)) ;typical element
+                (firsts (rest l)))))
 
 ;;Mental Model that works for me:
 (firsts '(['a 'b] ['c 'd] ['e 'f]))
@@ -83,8 +82,8 @@
   [l]
   (cond
     (not (seq l)) '()
-    (< (count (first l)) 2) (seconds (cdr l))
-    :else (cons (car (cdr (car l))) (seconds (cdr l)))))
+    (< (count (first l)) 2) (seconds (rest l))
+    :else (cons (first (rest (first l))) (seconds (rest l)))))
 
 (defn insertR
   "Adds nu to the right of old in a lat
@@ -93,8 +92,8 @@
   [nu old lat]
   (cond
     (not (seq lat)) '()
-    (eq? old (car lat)) (cons old (cons nu (cdr lat)))
-    :else (cons (car lat) (insertR nu old (cdr lat)))))
+    (eq? old (first lat)) (cons old (cons nu (rest lat)))
+    :else (cons (first lat) (insertR nu old (rest lat)))))
 
 (defn insertL
   "Adds nu to the left of old in a lat
@@ -103,8 +102,8 @@
   [nu old lat]
   (cond
     (not (seq lat)) '()
-    (eq? (car lat) old) (cons nu lat)
-    :else (cons (car lat) (insertL nu old (cdr lat)))))
+    (eq? (first lat) old) (cons nu lat)
+    :else (cons (first lat) (insertL nu old (rest lat)))))
 
 (defn subst
   "Substitutes first instance of old value with nu
@@ -113,8 +112,8 @@
   [nu old lat]
   (cond
     (not (seq lat)) '()
-    (eq? old (car lat)) (cons nu (cdr lat))
-    :else (cons (car lat) (subst nu old (cdr lat)))))
+    (eq? old (first lat)) (cons nu (rest lat))
+    :else (cons (first lat) (subst nu old (rest lat)))))
 
 (defn subst2
   "Replaces the first element = o1 or o2 with nu
@@ -124,30 +123,38 @@
   (cond
     (not (seq lat)) '()
     (or
-     (eq? (car lat) o2)
-     (eq? (car lat) o1)) (cons nu (cdr lat))
-    :else (cons (car lat) (subst2 nu o1 o2 (cdr lat)))))
+     (eq? (first lat) o2)
+     (eq? (first lat) o1)) (cons nu (rest lat))
+    :else (cons (first lat) (subst2 nu o1 o2 (rest lat)))))
 
-(defn multirember [a lat]
+(defn multirember
+  "removes all instances of a from lat"
+  [a lat]
   (cond
     (not (seq lat)) '()
-    (eq? (car lat) a) (multirember a (cdr lat))
-    :else (cons (car lat) (multirember a (cdr lat)))))
+    (eq? (first lat) a) (multirember a (rest lat))
+    :else (cons (first lat) (multirember a (rest lat)))))
 
-(defn multiinsertR [nu old lat]
+(defn multiinsertR
+  "Inserts item to the right of old with new"
+  [nu old lat]
   (cond
     (not (seq lat)) '()
-    (eq? (car lat) old) (cons old (cons nu (multiinsertR nu old (cdr lat))))
-    :else (cons (car lat) (multiinsertR nu old (cdr lat)))))
+    (eq? (first lat) old) (cons old (cons nu (multiinsertR nu old (rest lat))))
+    :else (cons (first lat) (multiinsertR nu old (rest lat)))))
 
-(defn multiinsertL [nu old lat]
+(defn multiinsertL
+  "Inserts item to the left of old with new"
+  [nu old lat]
   (cond
     (not (seq lat)) '()
-    (eq? (car lat) old) (cons nu (cons old (multiinsertL nu old (cdr lat))))
-    :else (cons (car lat) (multiinsertL nu old (cdr lat)))))
+    (eq? (first lat) old) (cons nu (cons old (multiinsertL nu old (rest lat))))
+    :else (cons (first lat) (multiinsertL nu old (rest lat)))))
 
-(defn multisubst [nu old lat]
+(defn multisubst
+  "Replaces all instances of old with nu"
+  [nu old lat]
   (cond
     (not (seq lat)) '()
-    (eq? (car lat) old) (cons nu (multisubst nu old (cdr lat)))
-    :else (cons (car lat) (multisubst nu old (cdr lat)))))
+    (eq? (first lat) old) (cons nu (multisubst nu old (rest lat)))
+    :else (cons (first lat) (multisubst nu old (rest lat)))))

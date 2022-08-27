@@ -1,11 +1,11 @@
 (ns little-schemer-clj.chapter4
   (:require
-   [little-schemer-clj.chapter1 :refer [car cdr]]))
+   [little-schemer-clj.chapter2 :refer [lat?]]))
 
 ;; Numbers Games
 
 ;; All numbers are atoms
-;; This book only onsiders non-negative integers (including 0)
+;; This book only considers non-negative integers (including 0)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;The First Commandment (first revision)
@@ -26,6 +26,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Always change at least one argument while recurring.
 ;; Bring the argument closer and closer to terminal condition.
+;;
+;;  Recall First Commandment:
 ;;  With lists, test termination with (not (seq x))
 ;;  With numbers, test termination with (zero? x)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -66,7 +68,7 @@
 
 (defn plus
   "Keep It Simple, Schemer.
-   Rather than ping ponging between the two (and hurting my head) - 
+   Rather than ping ponging between the two (and hurting my head) -
    just inc x times to y
    recurses smaller # of times
    Think of plus as cons for building numbers"
@@ -81,8 +83,6 @@
 ;ends up like thissss:
 ;; (plus 4 7)
 ;; (add1 (add1 (add1 (add1 7)
-(plus 4 7)
-(add1 (add1 (add1 (add1 7))))
 
 (defn minus
   "Subtraction: [minuend - subtrahend = difference]
@@ -101,7 +101,7 @@
   (cond
     (string? coll) false
     (int? coll) false
-    (int? (car coll)) (tup? (cdr coll))
+    (int? (first coll)) (tup? (rest coll))
     (not (seq coll)) true ;terminal condition
     :else false))
 
@@ -112,24 +112,7 @@
   (when (tup? tup)
     (if (not (seq tup))
       0
-      (plus (car tup) (addtup (cdr tup))))))
-
-;TODO - move to test file
-(plus 3 (plus 3 4))
-(addtup [15 6 7 12 3])
-
-(= (plus 1 0) (addtup [1]))
-
-(addtup [99 33])
-(tup? [1 2 3 4])
-(tup? 3)
-(tup? "whattt")
-(tup? [1 "2" 3 4])
-
-(tup? [1 2 3 4 5])
-(cons (plus 1 2) (addtup [3 4 5]))
-
-(addtup [1 2 3 "4"])
+      (plus (first tup) (addtup (rest tup))))))
 
 (defn multiply
   "To define multiply recursively using addition,
@@ -142,18 +125,7 @@
 ; (multiply x (sub1)) => "the natural recursion"
 ; natural recurstion = "the part where the function calls itself"
 
-(multiply 8 9)
-(multiply 13 4)
-(multiply 3 5)
-(multiply 12 3)
-;; (+ 12 (multiply 12 2))
-;; (+ 12 (+ 12 (multiply 12 1)))
-;; (+ 12 (+ 12 (+ 12 (multiply 12 0))))
-;; (+ 12 (+ 12 (+ 12 0)))
-
-(minus 10 3)
-
-(defn tup+
+(defn tup+ignore-extras
   "This will recursively add values at set idx's in a tuple
    to create a new tuple,
    behaves like Clojure where additional vals are ignored"
@@ -163,7 +135,7 @@
      (not (seq tup2))
      (not (seq tup1))) '()
     :else
-    (cons (plus (car tup1) (car tup2)) (tup+ (cdr tup1) (cdr tup2)))))
+    (cons (plus (first tup1) (first tup2)) (tup+ignore-extras (rest tup1) (rest tup2)))))
 
 (defn tup+
   "The book's version
@@ -173,42 +145,120 @@
     (not (seq tup2)) tup1
     (not (seq tup1)) tup2
     :else
-    (cons (plus (car tup1) (car tup2)) (tup+ (cdr tup1) (cdr tup2)))))
+    (cons (plus (first tup1) (first tup2)) (tup+ (rest tup1) (rest tup2)))))
 
-;so when one tuple returns empty, you cons everything onto the other tuple
-;it would like kind of like
-(tup+ [3 1] [9 6 5 4 3 2 1 0])
-; (cons 12 (cons 7 (5 4 3 2 1 0)))
-(cons 12 (cons 7 '(5 4 3 2 1)))
-
-(tup+ [3 6 9 11 4] [8 5 2 0 7])
-(tup+ [3 2 1 0] [9 85 100 7])
-(tup+ [2 3 4 5 7 6 100 3102 30124 2321324 43] [3 4 5 6])
-
-(defn >>
+(defn greater-than
   "using >> because > is defined in clj already"
   [x y]
   (cond
     (zero? x) false
     (zero? y) true
     :else
-    (>> (sub1 x) (sub1 y))))
+    (greater-than (sub1 x) (sub1 y))))
 
-(>> 6 5)
-(>> 1 23)
-(>> 2349 2)
-(>> 3 3)
-(>> 4 3)
-
-(defn <<
+(defn less-than
   "using << because > is defined in clj already"
   [x y]
   (cond
     (zero? y) false
     (zero? x) true
     :else
-    (<< (sub1 x) (sub1 y))))
+    (less-than (sub1 x) (sub1 y))))
 
-(<< 3 4)
-(<< 4 4)
-(<< 4 3)
+(defn eq-n
+  "Numbers only - see `eq?` from chap1 for other atoms
+   I think there's a typo in the book?
+   Oh well, define = in terms of < and >"
+  [x y]
+  (cond
+    (or (greater-than y x) (less-than y x)) false
+    :else true))
+
+(defn exp
+  "Recursive fn for finding exponent"
+  [x y]
+  (if
+   (zero? y) 1
+   (multiply x (exp x (sub1 y)))))
+
+(defn divide
+  "Division without consideration for modulo
+   Counts how many times the second arg goes into the first"
+  [x y]
+  (cond
+    (less-than x y) 0
+    :else
+    (add1 (divide (minus x y) y))))
+
+(defn modulo
+  "Recursive definition for mod"
+  [x y]
+  (cond
+    (less-than x y) x
+    :else
+    (modulo (minus x y) y)))
+
+(defn length [lat]
+  (when (lat? lat)
+    (if
+     (not (seq lat)) 0
+     (add1 (length (rest lat))))))
+
+(defn pick
+  "recursively decrements n until it gets to 1
+   returns nil if n gets to zero (only happens when arg is set to 0)
+   returns nil if n is larger than size of lat because:
+   (car '()) is nil and n is dec'd on each recursion"
+  [n lat]
+  (when (lat? lat)
+    (cond
+      (eq-n n 0) nil
+      (eq-n n 1) (first lat)
+      :else
+      (pick (sub1 n) (rest lat)))))
+
+;; I just decided - no more cdr or car
+;; it's too annoying and I am trying to learn Clojure not Scheme
+;;
+;;let's utilize destructuring for first and rest next to see
+
+(defn no-nums
+  "recursively removes all numbers from lat"
+  [lat]
+  (let [[first-item & remaining-items] lat]
+    (cond
+      (not (seq lat)) '()
+      (number? first-item) (no-nums remaining-items)
+      :else
+      (cons first-item (no-nums remaining-items)))))
+;IMO - the destructuring makes things worse here...
+;case by case basis, I guess
+
+(defn all-nums
+  "recursively removes all non-numbers from lat"
+  [lat]
+  (cond
+    (not (seq lat)) '()
+    (not (number? (first lat))) (all-nums (rest lat))
+    :else
+    (cons (first lat) (all-nums (rest lat)))))
+
+;;not going to bother with eqan? fn because we have clojure core's =
+
+(defn occur
+  "counts the number of times an atom a appears in the lat"
+  [a lat]
+  (cond
+    (not (seq lat)) 0
+    (= (first lat) a) (inc (occur a (rest lat)))
+    :else
+    (occur a (rest lat))))
+
+(defn one? [x]
+  (= x 1))
+
+(defn rempick
+  "returns seq with nth item removed"
+  [n lat]
+  (if (one? n) (rest lat)
+      (cons (first lat) (rempick (sub1 n) (rest lat)))))

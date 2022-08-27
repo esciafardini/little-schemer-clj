@@ -36,10 +36,6 @@
 
 (def not-eq? (complement eq?))
 
-(def car first)
-
-(def cdr rest)
-
 (defn null?
   "Is x an empty list?"
   [x]

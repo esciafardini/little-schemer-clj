@@ -1,6 +1,6 @@
 (ns little-schemer-clj.chapter2
   (:require
-   [little-schemer-clj.chapter1 :refer [atom? eq? car cdr null?]]))
+   [little-schemer-clj.chapter1 :refer [atom? eq?]]))
 
 ;; Chapter 2, during which the unskilled developer chews on recursion and feels sick to his stomach
 
@@ -17,5 +17,5 @@
   [a lat]
   (cond
     (not (seq lat)) false
-    (eq? (car lat) a) true
-    :else (member? a (cdr lat))))
+    (eq? (first lat) a) true
+    :else (member? a (rest lat))))

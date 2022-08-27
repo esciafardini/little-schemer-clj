@@ -4,7 +4,7 @@
                                         multiinsertR multirember multisubst
                                         rember rember-ERROR seconds subst subst2]]))
 
-;TODO: move these into test functions
+;TODO move these into test fns
 (=
  (rember "mint" ["lamb" "mint" "jelly" "mint"])
  (cons "lamb" '("jelly" "mint"))) ;=> true
