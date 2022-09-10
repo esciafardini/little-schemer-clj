@@ -1,10 +1,12 @@
 (ns little-schemer-clj.chapter5-test
   (:require
    [clojure.test :refer [deftest is]]
-   [little-schemer-clj.chapter5 :refer [rember*]]))
+   [little-schemer-clj.chapter3 :refer [multirember]]
+   [little-schemer-clj.chapter5 :refer [eqlist? insertL* insertR* leftmost
+                                        member* occur* rember*
+                                        subst*]]))
 
 (deftest breaking-down-rember*
-
   (deftest smallest-parts-rember*
     ; "cup" is not part of data structure
     ; notice surrounding parens remain in tact
@@ -31,70 +33,111 @@
            (cons (cons "tea" []) [])
            [["tea"]]))))
 
-(comment "FIX DEEZ"
+(deftest chapter-5
+  (is
+   (=
+    [["how" "much" []]
+     "could"
+     [["a" [] "chuck"]]
+     ["if" ["a"] [[["chuck"]]] "could"]
+     [["chuck"]]]
+    (rember* "wood" [["how" "much" ["wood"]]
+                     "could"
+                     [["a" ["wood"] "chuck"]]
+                     ["if" ["a"] "wood" [[["chuck"]]] "could"]
+                     [["chuck"] "wood"]])))
 
-(= [["coffee"] [["tea"]] ["and" ["hick"]]]
-   (rember* "cup" [["coffee"] "cup" [["tea"] "cup"] ["and" ["hick"]] "cup"]))
+  (is
+   (=
+    (multirember "wood" ["wood" ["how" "much" ["wood"]]
+                         "could"
+                         "wood"
+                         [["a" ["wood"] "chuck"]]
+                         ["if" ["a"] "wood" [[["chuck"]]] "could"]
+                         [["chuck"] "wood"]])
+    '(["how" "much" ["wood"]]
+      "could"
+      [["a" ["wood"] "chuck"]]
+      ["if" ["a"] "wood" [[["chuck"]]] "could"]
+      [["chuck"] "wood"])))
+  (is
+   (=
+    nil
+    (leftmost [[[[] "four"] 17 ["seventeen"]]])
+    (leftmost '())))
+  (is
+   (=
+    "deep nest"
+    (leftmost [[[[[[[["deep nest"]]]]] "four"] 17 ["seventeen"]]])))
 
-; the * walks through each collection, I suppose...
+  (is
+   (=
+    true
+    (eqlist? [1 29 [1 2 [3 4]] 2 [2 2 3] 2 3] [1 29 [1 2 [3 4]] 2 [2 2 3] 2 3])))
 
-; Right away, I am noticing Chapter 5 is more difficult than previous chapters
+  (is
+   (=
+    false
+    (eqlist? [2 29 [1 2 [3 4]] 2 [2 2 3] 2 3] [1 29 [1 2 [3 4]] 2 [2 2 3] 2 3])))
 
-;step by step
-(rember* "cup" [["coffee"] "cup" [["tea"] "cup"] ["and" ["hick"]] "cup"])
-; 1
-; ["coffee"] is idx0
-; (coll? idx0) => true
-; (cons (rember* "cup" ["coffee"]) (rember* "cup" [[["tea"] "cup"] ["and" ["hick"]] "cup"])
+  (is
+   (=
+    (insertR* "roast" "chuck" [["how" "much" ["wood"]]
+                               "could"
+                               [["a" ["wood"] "chuck"]]
+                               ["if" ["a"] "wood" [[["chuck"]]] "could"]
+                               [["chuck"] "wood"]])
+    '(("how" "much" ("wood"))
+      "could"
+      (("a" ("wood") "chuck" "roast"))
+      ("if" ("a") "wood" ((("chuck" "roast"))) "could")
+      (("chuck" "roast") "wood"))))
 
-(cons
- (rember* "cup" ["coffee"])
- (rember* "cup" [[["tea"]] ["and" ["hick"]]]))
+  (is
+   (=
+    (occur* "banana" [["banana"] "yas" ["split" ["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]])
+    (+ (occur* "banana" ["banana"]) (occur* "banana" ["yas" ["split" ["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]]))
+    (+ (inc 0) (occur* "banana" ["yas" ["split" ["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]]))
+    (+ (inc 0) (occur* "banana" ["split" ["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]))
+    (+ (inc 0) (occur* "banana" [["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]))
+    (+ (inc 0) (+ (occur* "banana" ["omg" "its" "banana" ["splut" "ice" "cream"]]) (occur* "banana" ["banana"])))
+    (+ (inc 0) (+ (occur* "banana" ["omg" "its" "banana" ["splut" "ice" "cream"]]) (inc 0)))
+    (+ (inc 0) (+ (occur* "banana" ["its" "banana" ["splut" "ice" "cream"]]) (inc 0)))
+    (+ (inc 0) (+ (occur* "banana" ["banana" ["splut" "ice" "cream"]]) (inc 0)))
+    (+ (inc 0) (+ (inc (occur* "banana" [["splut" "ice" "cream"]])) (inc 0)))
+    (+ (inc 0) (+ (inc (+ 0 0)) (inc 0)))))
 
-; (rember* "cup" ["coffee"])
-; idx0 is "coffee"
-; "coffee" != "cup"
-; (cons "coffee" (rember* '()))
+  (is
+   (=
+    (subst* "orange" "banana" [["banana"] "yas" ["split" ["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]])
+    '(("orange")
+      "yas"
+      ("split" ("omg" "its" "orange" ("splut" "ice" "cream")) "orange"))))
 
-; RECALL: (rember* '()) => '()
-; (cons "coffee" '())
+  (insertL* "fire" "wood"
+            [["how" "much" ["wood"]]
+             "could"
+             [["a" ["wood"] "chuck"]]
+             ["if" ["a"] "wood" [[["chuck"]]] "could"]
+             [["chuck"] "wood"]])
 
-(cons "coffee" '())
+  (is
+   (=
+    (leftmost
+     [["how" "much" ["wood"]]
+      "could"
+      [["a" ["wood"] "chuck"]]
+      ["if" ["a"] "wood" [[["chuck"]]] "could"]
+      [["chuck"] "wood"]])
+    "how"))
 
-;ultimately, returns '(coffee) as it was in its original form
-
-;if
-(rember* "cup" ["coffee"]) = '("coffee")
-;then
-(cons (rember* "cup" ["coffee"]) (rember* "cup" [[["tea"] "cup"] ["and" ["hick"]] "cup"]))
-; =
-(cons '("coffee") (rember* "cup" [[["tea"] "cup"] ["and" ["hick"]] "cup"]))
-;
-;
-;; ok, so what happens here then.....
-(rember* "cup" [[["tea"]] ["and" ["hick"] "cup"]])
-
-; idx0 is
-[["tea"]]
-; remaining is
-["and" ["hick"] "cup"]
-
-;interesting...so idx0 it is a collection
-;I just want to see how this pans out...
-(cons (rember* "cup" [["tea"]]) (rember* "cup" ["and" ["hick"] "cup"]))
-;
-(rember* "cup" [["tea"]])
-; =
-(cons (rember* "cup" ["tea"]) (rember* "cup" '()))
-
-;now rember* hits else block bc "tea" is not a collection
-(cons
- (cons "tea" (rember* "cup" '()))
- (rember* "cup" '()))
-
-(cons
- (cons "tea" '())
- '())
-
-;Ultimately, items are recursively cons'd back into '() empty seqs
-)
+  (is
+   (=
+    true
+    (member*
+     "if"
+     [["how" "much" ["wood"]]
+      "could"
+      [["a" ["wood"] "chuck"]]
+      ["if" ["a"] "wood" [[["chuck"]]] "could"]
+      [["chuck"] "wood"]]))))

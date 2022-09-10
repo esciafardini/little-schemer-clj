@@ -45,6 +45,12 @@
 ;; What is a * function?
 ;;  One that recurs on both the first and the rest
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;The Sixth Commandment
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;  ONLY simplify after the function works
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn rember*
   "Retains data structure while recursively checking each collection for existence
    of atom a & removing it"
@@ -64,19 +70,6 @@
       :else
       (cons (rember* a idx0) (rember* a remaining)))))
 
-(rember* "wood" [["how" "much" ["wood"]]
-                 "could"
-                 [["a" ["wood"] "chuck"]]
-                 ["if" ["a"] "wood" [[["chuck"]]] "could"]
-                 [["chuck"] "wood"]])
-
-(multirember "wood" ["wood" ["how" "much" ["wood"]]
-                     "could"
-                     "wood"
-                     [["a" ["wood"] "chuck"]]
-                     ["if" ["a"] "wood" [[["chuck"]]] "could"]
-                     [["chuck"] "wood"]])
-
 (defn insertR*
   "Insert nu to the ~R~ight of old item wherever it shows up in coll"
   [nu old coll]
@@ -92,12 +85,6 @@
 
       :else
       (cons (insertR* nu old idx0) (insertR* nu old remaining)))))
-
-(insertR* "roast" "chuck" [["how" "much" ["wood"]]
-                           "could"
-                           [["a" ["wood"] "chuck"]]
-                           ["if" ["a"] "wood" [[["chuck"]]] "could"]
-                           [["chuck"] "wood"]])
 
 (def counter (atom 0))
 
@@ -120,8 +107,6 @@
         (occur-with-atom* a idx0)
         (occur-with-atom* a remaining)))))
 
-(occur-with-atom* "banana" [["banana"] "yas" ["split" ["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]])
-
 (defn occur*
   "grok this you must"
   [a l]
@@ -139,18 +124,6 @@
       :else
       (+ (occur* a idx0) (occur* a remaining)))))
 
-(occur* "banana" [["banana"] "yas" ["split" ["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]])
-(+ (occur* "banana" ["banana"]) (occur* "banana" ["yas" ["split" ["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]]))
-(+ (inc 0) (occur* "banana" ["yas" ["split" ["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]]))
-(+ (inc 0) (occur* "banana" ["split" ["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]))
-(+ (inc 0) (occur* "banana" [["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]))
-(+ (inc 0) (+ (occur* "banana" ["omg" "its" "banana" ["splut" "ice" "cream"]]) (occur* "banana" ["banana"])))
-(+ (inc 0) (+ (occur* "banana" ["omg" "its" "banana" ["splut" "ice" "cream"]]) (inc 0)))
-(+ (inc 0) (+ (occur* "banana" ["its" "banana" ["splut" "ice" "cream"]]) (inc 0)))
-(+ (inc 0) (+ (occur* "banana" ["banana" ["splut" "ice" "cream"]]) (inc 0)))
-(+ (inc 0) (+ (inc (occur* "banana" [["splut" "ice" "cream"]])) (inc 0)))
-(+ (inc 0) (+ (inc (+ 0 0)) (inc 0)))
-
 (defn subst* [nu old l]
   (let [idx0 (first l)
         remaining (rest l)]
@@ -165,8 +138,6 @@
       :else
       (cons (subst* nu old idx0) (subst* nu old remaining)))))
 
-(subst* "orange" "banana" [["banana"] "yas" ["split" ["omg" "its" "banana" ["splut" "ice" "cream"]] "banana"]])
-
 (defn insertL* [nu old l]
   (let [idx0 (first l)
         remaining (rest l)]
@@ -180,13 +151,6 @@
 
       :else
       (cons (insertL* nu old idx0) (insertL* nu old remaining)))))
-
-(insertL* "fire" "wood"
-          [["how" "much" ["wood"]]
-           "could"
-           [["a" ["wood"] "chuck"]]
-           ["if" ["a"] "wood" [[["chuck"]]] "could"]
-           [["chuck"] "wood"]])
 
 (defn member*
   "walks through data structure and checks for existence of a"
@@ -206,14 +170,6 @@
        (member* a idx0)
        (member* a remaining)))))
 
-(member*
- "if"
- [["how" "much" ["wood"]]
-  "could"
-  [["a" ["wood"] "chuck"]]
-  ["if" ["a"] "wood" [[["chuck"]]] "could"]
-  [["chuck"] "wood"]])
-
 (defn leftmost
   "Finds the leftmost atom in a non-empty list of S-expressions that does not contain the empty list
    This is not a (*) function because it only recurs on (first l)"
@@ -223,19 +179,41 @@
       idx0
       (leftmost idx0))))
 
-(leftmost
- [["how" "much" ["wood"]]
-  "could"
-  [["a" ["wood"] "chuck"]]
-  ["if" ["a"] "wood" [[["chuck"]]] "could"]
-  [["chuck"] "wood"]])
-
-(leftmost [[[[] "four"] 17 ["seventeen"]]])
-(leftmost '())
-(leftmost [[[[[[[["deep nest"]]]]] "four"] 17 ["seventeen"]]])
-
-(defn example [a l]
+(defn example
+  "checks is a a collection? + is the first item in list a?"
+  [a l]
   (and (not (coll? a))
        (= (first l) a)))
 
-(example "cheese" ["cheese" "pizza"])
+(declare eqlist?)
+
+(defn equal? [s1 s2]
+  (cond
+    (and (not (coll? s1))
+         (not (coll? s2)))
+    (= s1 s2)
+
+    (or (not (coll? s1)) (not (coll? s2)))
+    false
+
+    :else
+    (eqlist? s1 s2)))
+
+(defn eqlist?
+  "Checks if two lists are equivalent"
+  [l1 l2]
+  (let [idx0_a (first l1)
+        idx0_b (first l2)
+        remaining_a (rest l1)
+        remaining_b (rest l2)]
+    (cond
+      (and (not (seq l1)) (not (seq l2)))
+      true
+
+      (or (not (seq l1)) (not (seq l2)))
+      false
+
+      :else
+      (and
+       (equal? idx0_a idx0_b)
+       (eqlist? remaining_a remaining_b)))))
