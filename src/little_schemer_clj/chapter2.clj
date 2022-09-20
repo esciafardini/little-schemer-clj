@@ -1,4 +1,5 @@
 (ns little-schemer-clj.chapter2
+  "Do It, Do It Again, and Again, and Again..."
   (:require
    [little-schemer-clj.chapter1 :refer [atom? eq?]]))
 

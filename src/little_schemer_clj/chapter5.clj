@@ -1,6 +1,5 @@
 (ns little-schemer-clj.chapter5
-  (:require
-   [little-schemer-clj.chapter3 :refer [multirember]]))
+  "*Oh my Gawd*: It's Full of Stars")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;The First Commandment (final version)

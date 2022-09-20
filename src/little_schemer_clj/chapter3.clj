@@ -1,4 +1,5 @@
 (ns little-schemer-clj.chapter3
+  "Cons the Magnificent"
   (:require
    [little-schemer-clj.chapter1 :refer [eq? not-eq?]]))
 

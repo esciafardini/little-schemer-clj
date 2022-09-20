@@ -1,4 +1,5 @@
-(ns little-schemer-clj.chapter1)
+(ns little-schemer-clj.chapter1
+  "Toys")
 
 (defn atom?
   "Atoms are not null && not surrounded by parens
@@ -7,7 +8,9 @@
    Lists not allowed
    For Clojure purposes, no collections allowed also (since they implement ISeq)"
   [x]
-  (and (not (coll? x)) (some? x)))
+  (and
+    (not (coll? x))
+    (some? x)))
 
 (defn listp?
   "enclosed by parenthesis"

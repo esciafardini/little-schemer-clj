@@ -1,4 +1,5 @@
 (ns little-schemer-clj.chapter4
+  "Numbers Games"
   (:require
    [little-schemer-clj.chapter2 :refer [lat?]]))
 
