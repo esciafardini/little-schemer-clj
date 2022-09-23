@@ -2,7 +2,7 @@
   "Friends And Relations"
   (:require
    [little-schemer-clj.chapter2 :refer [member?]]
-   [little-schemer-clj.chapter3 :refer [multirember]]))
+   [little-schemer-clj.chapter3 :refer [firsts multirember]]))
 
 ;Set Theory, anyone?
 
@@ -29,11 +29,8 @@
     (cons (first lat) (makeset (rest lat)))))
 
 (defn makeset2 [lat]
-  (cond
-    (not (seq lat))
+  (if (not (seq lat))
     '()
-
-    :else
     (cons (first lat) (makeset2 (multirember (first lat) (rest lat))))))
 
 (defn my-subset [set1 set2]
@@ -127,10 +124,54 @@
     (first l-set)
     (intersect (first l-set) (intersect-all (rest l-set)))))
 
-(defn a-pair? [l]
+(defn a-pair?
+  "is is a pair?"
+  [l]
   (= 2 (count l)))
 
 (defn build
   "FAILING TO SEE THE POINT SIR"
   [s1 s2]
   (cons s1 (cons s2 (list))))
+
+(defn empty-seq? [l] (not (seq l)))
+
+(defn rel?
+  "A rel is a pair: [4 3] for example...
+   Remove all pairs, then ask - is there anything left?
+   If nothing is left, it is a rel."
+  [l]
+  (empty-seq? (remove (fn [x] (= (count x) 2)) l)))
+
+(defn revpair
+  "Reverse a pair"
+  [pair]
+  (build (second pair) (first pair)))
+
+(defn revrel
+  "Reverse all pairs"
+  [rel]
+  (if (empty-seq? rel)
+    '()
+    (cons
+     (revpair (first rel))
+     (revrel (rest rel)))))
+
+(defn seconds [l]
+  (map (fn [x] (second x)) l))
+
+(defn fun?
+  "ALL IDX 0 (first) VALUES ARE UNIQUE"
+  [rel]
+  (my-set? (firsts rel)))
+
+(defn fullfun?
+  "ALL IDX 1 (second) VALUES ARE UNIQUE"
+  [seq-of-rels]
+  (my-set? (seconds seq-of-rels)))
+
+(defn one-to-one?
+  "Another way to write fullfun? AKA
+   ALL IDX 1 (second) VALUES ARE UNIQUE"
+  [fun]
+  (fun? (revrel fun)))

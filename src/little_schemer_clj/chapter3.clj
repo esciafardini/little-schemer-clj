@@ -61,19 +61,18 @@
 
 (defn firsts
   "returns the first value of each seq
-   Typical Element: first item of each list
-   (car (car l))"
+   Typical Element: first item of each list"
   [l]
-  (cond
-    (not (seq l)) '() ;terminal condition
-    :else (cons (first (first l)) ;typical element
-                (firsts (rest l)))))
+  (let [idx0 (first l)
+        remaining (rest l)]
+    (if (not (seq l))
+      '()
+      (cons (first idx0)
+            (firsts remaining)))))
 
 ;;Mental Model that works for me:
 (firsts '(['a 'b] ['c 'd] ['e 'f]))
-;; 1. cons a onto
-;; 2. the cons of c onto
-;; 3. the cons of e onto '()
+;; (cons 'a (cons 'c (cons 'e '())
 ;=> ('a 'c 'e)
 
 (defn seconds

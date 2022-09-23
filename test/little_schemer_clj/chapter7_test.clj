@@ -1,18 +1,15 @@
 (ns little-schemer-clj.chapter7-test
   (:require
-   [little-schemer-clj.chapter2 :refer [member?]]
-   [little-schemer-clj.chapter3 :refer [multirember]]
-   [little-schemer-clj.chapter7 :refer [a-pair? build eqset? intersect
-                                        intersect-all intersect-with-or? intersect?
-                                        makeset makeset2 my-set? subset-with-and? union xxx]]))
+   [little-schemer-clj.chapter7 :refer [a-pair? build eqset? fullfun? fun?
+                                        intersect intersect-all
+                                        intersect-with-or? intersect? makeset makeset2 my-set? one-to-one? rel? revrel seconds
+                                        subset-with-and? union xxx]]))
 
 (my-set? [1 2 3])
-(member? 2 [1 2 3 4])
 (my-set? '(1 2 3 4 3))
 (my-set? [1 2 4 3])
 (makeset [1 12 13 1 2 3 13])
 (makeset ['apple 'peach 'pear 'peach 'plum 'apple 'lemon 'peach])
-(multirember "peach" ["rich" "peach" "with" "peach"])
 (makeset2 ['apple 'peach 'pear 'peach 'plum 'apple 'lemon 'peach])
 
 (subset-with-and?
@@ -71,3 +68,20 @@
 (concat [23 34 2] [3 "ok"])
 (into '() [[23 34 3] [3 "ok"]])
 
+(fun? [[8 3] [4 2] [7 6]])
+(fun? [[8 5] [8 3] [4 2] [7 6]])
+
+
+(rel? [[1 2] [4 3] [43 2]])
+
+(rel? [[1 2] [31 4 3] [43 2]])
+
+(revrel [['up "LISTEN"] ["cuz" "yawl"] ["flipdagizsm" "I Am"]])
+
+(seconds [[8 5] [8 3] [4 2] [7 6]])
+
+(fullfun? [["grape" "raisin"] ["plum" "prune"] ["stewed" "grape"]])
+(fullfun? [["plum" "raisin"] ["plum" "prune"] ["stewed" "grape"]])
+(fullfun? [["grap" "prune" "raisin"] ["plum" "prune"] ["stewed" "grape"]])
+
+(one-to-one? [["chocolate" "chip"] ["doughy" "cookie"]])
