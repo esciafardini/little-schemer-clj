@@ -1,7 +1,7 @@
 (ns little-schemer-clj.chapter2
   "Do It, Do It Again, and Again, and Again..."
   (:require
-   [little-schemer-clj.chapter1 :refer [atom? eq?]]))
+   [little-schemer-clj.chapter1 :refer [atom?]]))
 
 ;; Chapter 2, during which the unskilled developer chews on recursion and feels sick to his stomach
 
@@ -18,5 +18,7 @@
   [a lat]
   (cond
     (not (seq lat)) false
-    (eq? (first lat) a) true
+    (= (first lat) a) true
     :else (member? a (rest lat))))
+
+(member? 3 [1 2 3])

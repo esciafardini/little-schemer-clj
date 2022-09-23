@@ -133,7 +133,7 @@
   [a lat]
   (cond
     (not (seq lat)) '()
-    (eq? (first lat) a) (multirember a (rest lat))
+    (= (first lat) a) (multirember a (rest lat))
     :else (cons (first lat) (multirember a (rest lat)))))
 
 (defn multiinsertR
