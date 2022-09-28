@@ -8,8 +8,7 @@
 
 (defn my-set? [lat]
   (cond
-    (not (seq lat))
-    true
+    (not (seq lat)) true
 
     (member? (first lat) (rest lat))
     false
@@ -32,6 +31,7 @@
   (if (not (seq lat))
     '()
     (cons (first lat) (makeset2 (multirember (first lat) (rest lat))))))
+
 
 (defn my-subset [set1 set2]
 

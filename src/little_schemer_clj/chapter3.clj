@@ -47,7 +47,7 @@
   [a lat]
   (cond
     (not (seq lat)) '()
-    (eq? a (first lat)) (rest lat)
+    (= a (first lat)) (rest lat)
     :else (cons (first lat)
                 (rember a (rest lat)))))
 
